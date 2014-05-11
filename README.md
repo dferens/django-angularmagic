@@ -8,6 +8,12 @@
 
 Provides *{% angularapp %}* tag which simplifies integration of Angular views into complete Django apps.
 
+<a name="requirements/">
+## Requirements
+
+* ~~~Python (2.6, 2.7, 3.2, 3.3)~~~
+* ~~~Django (1.4 - 1.6)~~~
+* [https://github.com/tomchristie/django-rest-framework][django-rest-framework]
 
 <a name="example"/>
 ## Example
@@ -40,14 +46,27 @@ class BlogPostDetail(DetailView):
 
 Now the most interesting:
 
-1. Include *AngularJS* and module's directives:
+1. Add *AngularMagicMixin* and describe inner context:
 
-    ```html
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.js"></script>
-    <script src="{% static 'angularmagic/angularmagic.js' %}"></script>
+    ```python
+    from django.views.generic import DetailView
+    from angularmagic.views import AngularMagicMixin
+
+    from . import models
+
+    class BlogPostDetail(AngularMagicMixin, DetailView):
+        model = models.BlogPost
+        context_object_name = 'blogpost'
+        template_name = 'blogpost_detail.html'
+
+        def get_included_context(self, context):
+            return {
+                'blogpost': context['blogpost'],
+                'comments': context['blogpost'].comments.all()
+            }
     ```
 
-1. Include *{% angularapp %}* tag and pass some variables from current context:
+1. Include *{% angularapp %}* tag:
 
     ```django
     {% load angularmagic %}
@@ -63,16 +82,16 @@ Now the most interesting:
     
     (It's even possible to mix Django tags with Angular views but I'm not sure it's a good practice.)
 
-1. Bind passed context to any Angular scope with *django-context* directive:
+1. Bind passed context to any Angular scope with *bind-django-context* directive:
 
     ```html
-    <div ng-controller="BlogPostCtrl" django-context>
+    <div ng-controller="BlogPostCtrl" bind-django-context>
     ```
 
 1. Add your view code:
     
     ```django
-    {% angularapp 'blogpost' comments=blogpost.comments.all %}
+    {% angularapp %}
       <div ng-controller="MyCtrl" django-context>
         {{ blogpost.text }}
         <div class="comment-holder">
@@ -86,32 +105,29 @@ Now the most interesting:
 
 Everything will be evaluated by AngularJS.
 
-
-<a name="requirements/">
-## Requirements
-
-* Python (2.6, 2.7, 3.2, 3.3)
-* Django (1.4 - 1.6)
-
-
 <a name="install"/>
 ## Installation
 
 ```bash
 pip install django-angularmagic
 ```
-
-<a name="config"/>
-## Configuration
-
 ```python
 INSTALLED_APPS = (
     ...
     'angularmagic',
 )
 ```
+```javascript
+angular.module('myModule', ['django.angularmagic']);
+```
+
+Grab module with
+
+```django
+<script src="{% static 'angularmagic/angularmagic.js' %}"></script>
+```
 
 ## TODOs:
-
-* Add *{% variable var_name %}* inclusion tag;
+* Add tests;
+* (?) Add *{% variable var_name %}* inclusion tag;
 * Add support of serializers from rest-framework & tastypie;
