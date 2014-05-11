@@ -71,7 +71,7 @@ Now the most interesting:
     ```django
     {% load angularmagic %}
     
-    {% angularapp 'blogpost' comments=blogpost.comments.all %}
+    {% angularapp %}
     //
     //  View code goes here ...
     //
@@ -92,7 +92,7 @@ Now the most interesting:
     
     ```django
     {% angularapp %}
-      <div ng-controller="MyCtrl" django-context>
+      <div ng-controller="MyCtrl" bind-django-context>
         {{ blogpost.text }}
         <div class="comment-holder">
           <div class="comment" ng-repeat="comment in comments">
