@@ -66,8 +66,10 @@ class RendererProviderMixin(object):
         return compat.render(renderer, context)
 
     def render_data_block(self, data_context):
+        rendered_context = self.render_included_context(data_context)
         template_context = {
-            'data': self.render_included_context(data_context),
+            'data': rendered_context,
+            'bytes': len(rendered_context),
             'DEBUG': settings.DEBUG,
         }
         return render_to_string(self.angular_context_template_name,

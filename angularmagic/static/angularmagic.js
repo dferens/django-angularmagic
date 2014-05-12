@@ -38,8 +38,10 @@ module.factory('contextStorage', function() {
       contextStorage.set(element.text());
       element.empty();
 
-      if (attrs.hasOwnProperty('debug')) {
-        console.log('Recieved Django context:\n', contextStorage.get());
+      if (attrs.debug) {
+        console.log('Recieved Django context ' +
+                    '(' + attrs.bytes + ' bytes):\n',
+                    contextStorage.get());
       }
     }
   };

@@ -1,4 +1,4 @@
-<django-context-item {% if DEBUG %}debug {% endif %}style="display:none">{% spaceless %}
+<django-context-item debug="{{DEBUG|lower}}" bytes="{{bytes}}" style="display:none">{% spaceless %}
 
   {{ data|safe }}
 
