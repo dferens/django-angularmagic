@@ -37,6 +37,7 @@ module.factory('contextStorage', function() {
     link: function(scope, element, attrs) {
       contextStorage.set(element.text());
       element.empty();
+      console.log(contextStorage.get());
     }
   };
 })

@@ -13,7 +13,7 @@ Provides *{% angularapp %}* tag which simplifies integration of Angular views in
 
 * ~~~Python (2.6, 2.7, 3.2, 3.3)~~~
 * ~~~Django (1.4 - 1.6)~~~
-* [https://github.com/tomchristie/django-rest-framework][django-rest-framework]
+* [django-rest-framework](https://github.com/tomchristie/django-rest-framework)
 
 <a name="example"/>
 ## Example

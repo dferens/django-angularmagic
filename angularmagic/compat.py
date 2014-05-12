@@ -1,81 +1,92 @@
-import inspect
-
-import django.db.models
-
 try:
     import simplejson as json
 except ImportError:
     import json
 
+import django.db.models
+
 try:
     import rest_framework
-    REST_FRAMEWORK = True
 except ImportError:
     REST_FRAMEWORK = False
+else:
+    REST_FRAMEWORK = True
 
 
 class BaseSerializer(object):
 
-    def serialize(self, obj, *args, **kwargs):
-        raise NotImplementedError
+    @classmethod
+    def get_model(cls):
+        return None
+
+    def __init__(self, *args, **kwargs):
+        super(BaseSerializer, self).__init__(*args, **kwargs)
+
+    def serialize(self):
+        raise NotImplementedError    
 
 
 class BaseRenderer(object):
 
-    def render(self, obj, *args, **kwargs):
+    def render(self):
         raise NotImplementedError
 
 
-def is_serializer(SerializerClass):
-    if inspect.isclass(SerializerClass):
-        if issubclass(SerializerClass, BaseSerializer):
-            return (True, None)
-
-        if REST_FRAMEWORK:
-            from rest_framework.serializers import Serializer, ModelSerializer
-
-            if issubclass(SerializerClass, ModelSerializer):
-                model = SerializerClass.Meta.model
-            else:
-                model = None
-
-            return (issubclass(SerializerClass, Serializer), model)
-
-    return (False, None)
-
-
-def serializer_factory(obj):
-    if isinstance(obj, django.db.models.Model):
-        ModelClass = type(obj)
-        serializer_name = ModelClass.__name__ + 'Serializer'
-
+def create_serializer_class(ObjectClass):
+    if issubclass(ObjectClass, django.db.models.Model):
         if REST_FRAMEWORK:
             from rest_framework.serializers import ModelSerializer
 
-            SerializerMeta = type('Meta', (), {'model': ModelClass})
-            SerializerClass = type(serializer_name, (ModelSerializer,),
-                                   dict(Meta=SerializerMeta))
+            SerializerMetaClass = type('Meta', (object,), {'model': ObjectClass})
+            return type(ObjectClass.__name__ + 'Serializer',
+                        (ModelSerializer,),
+                        {'Meta': SerializerMetaClass})
 
-    return None
+
+def create_serializer(SerializerClass, obj):
+    if issubclass(SerializerClass, BaseSerializer):
+        return SerializerClass(obj)
+
+    if REST_FRAMEWORK:
+        from rest_framework.serializers import Serializer
+
+        if issubclass(SerializerClass, Serializer):
+            if hasattr(obj, '__iter__'):
+                return SerializerClass(obj, many=True)
+            else:
+                return SerializerClass(obj)
 
 
-def serialize(serializer_obj, data):
+def serialize(serializer_obj):
     if isinstance(serializer_obj, BaseSerializer):
-        return serializer_obj.serialize(data)
+        return serializer_obj.serialize()
 
     if REST_FRAMEWORK:
         from rest_framework.serializers import Serializer
 
         if isinstance(serializer_obj, Serializer):
-            return serializer_obj.to_native(data)
+            return serializer_obj.data
 
-    raise TypeError("Don't know how to use \"%s\" object as serializer",
-                    type(serializer_obj).__name__)
 
-def render(renderer_obj, data):
+def get_serializer_model(SerializerClass):
+    if issubclass(SerializerClass, BaseSerializer):
+        return SerializerClass.get_model()
+
+    if REST_FRAMEWORK:
+        from rest_framework.serializers import ModelSerializer
+
+        if issubclass(SerializerClass, ModelSerializer):
+            return SerializerClass.Meta.model
+
+
+def create_renderer(RendererClass, context):
+    if issubclass(RendererClass, json.JSONEncoder):
+        return RendererClass()    
+
+
+def render(renderer_obj, context):
     if isinstance(renderer_obj, BaseRenderer):
-        return renderer_obj.render(data)
-    
-    if isinstance(renderer_obj, json.JSONEncoder):
-        return renderer_obj.encode(data)
+        return renderer_obj.render()
 
+    if isinstance(renderer_obj, json.JSONEncoder):
+        return renderer_obj.encode(context)
