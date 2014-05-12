@@ -18,6 +18,10 @@ class DefaultRenderer(json.JSONEncoder):
         datetime.timedelta: lambda td: td.isoformat(),
     }
 
+    def __init__(self, *args, **kwargs):
+        kwargs.update(separators=(',', ':'))
+        super(DefaultRenderer, self).__init__(*args, **kwargs)
+
     def default(self, obj):
         module, name = type(obj).__module__, type(obj).__name__
         render_rule = self.RENDER_RULES.get(type(obj)) or str
