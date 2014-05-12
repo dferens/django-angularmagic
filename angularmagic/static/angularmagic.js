@@ -37,7 +37,10 @@ module.factory('contextStorage', function() {
     link: function(scope, element, attrs) {
       contextStorage.set(element.text());
       element.empty();
-      console.log(contextStorage.get());
+
+      if (attrs.hasOwnProperty('debug')) {
+        console.log('Recieved Django context:\n', contextStorage.get());
+      }
     }
   };
 })

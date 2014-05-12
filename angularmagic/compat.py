@@ -28,6 +28,9 @@ class BaseSerializer(object):
 
 class BaseRenderer(object):
 
+    def __init__(self, *args, **kwargs):
+        super(BaseRenderer, self).__init__(*args, **kwargs)
+
     def render(self):
         raise NotImplementedError
 

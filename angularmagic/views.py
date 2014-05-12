@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.db.models.query import QuerySet
+from django.template.loader import render_to_string
 from django.utils import six
 
 from . import appsettings, compat
@@ -47,6 +49,7 @@ class SerializerProviderMixin(object):
 class RendererProviderMixin(object):
 
     renderer_class = None
+    angular_context_template_name = 'angularmagic/context-item.html'
 
     def get_renderer_class(self):
         if self.renderer_class:
@@ -62,10 +65,13 @@ class RendererProviderMixin(object):
         renderer = self.get_renderer(context)
         return compat.render(renderer, context)
 
-    def render_data_block(self, context):
-        rendered_context = self.render_included_context(context)
-        tmpl = '<django-context-item style="display:none">%s</django-context-item>'
-        return tmpl % (rendered_context,)
+    def render_data_block(self, data_context):
+        template_context = {
+            'data': self.render_included_context(data_context),
+            'DEBUG': settings.DEBUG,
+        }
+        return render_to_string(self.angular_context_template_name,
+                                template_context)
 
 
 class BaseAngularMagicMixin(object):
