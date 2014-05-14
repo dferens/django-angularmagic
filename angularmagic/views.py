@@ -3,37 +3,41 @@ from django.db.models.query import QuerySet
 from django.template.loader import render_to_string
 from django.utils import six
 
-from . import appsettings, compat
+from . import appsettings, base, external
 
 
 class SerializerProviderMixin(object):
 
     serializer_classes = []
 
-    def get_serializer_class(self, obj):
+    def get_serializer(self, obj):
+        """
+        :return: ``angularmagic.base.Serializer`` instance
+        """
+        SerializerClass = None
         ObjectClass = obj.model if isinstance(obj, QuerySet) else type(obj)
-        
+
         if isinstance(self.serializer_classes, dict):
-            SerializerClass = self.serializer_classes.get(ObjectClass)
-            if SerializerClass:
-                return SerializerClass
+            SerializerClass = self.serializer_classes.get(ObjectClass, SerializerClass)
         elif isinstance(self.serializer_classes, (list, tuple)):
-            for SerializerClass in self.serializer_classes:
-                if compat.get_serializer_model(SerializerClass) is ObjectClass:
-                    return SerializerClass
+            for Class in self.serializer_classes:
+                if issubclass(Class, base.Serializer):
+                    if Class.model is ObjectClass:
+                        SerializerClass = Class
+                        break
+                else:
+                    adapter = external.create_serializer_adapter(Class, obj)
+                    if adapter.model is ObjectClass:
+                        return adapter
         else:
             raise TypeError('``serializer_classes`` value should be iterable or dict')
 
-        return compat.create_serializer_class(ObjectClass)
-
-    def get_serializer(self, obj):
-        SerializerClass = self.get_serializer_class(obj)
+        SerializerClass = SerializerClass or appsettings.DEFAULT_SERIALIZER_CLASS
+        if issubclass(SerializerClass, base.Serializer):
+            return SerializerClass(obj)
+        else:
+            return external.create_serializer_adapter(SerializerClass, obj)
         
-        if SerializerClass is None:
-            return None
-
-        return compat.create_serializer(SerializerClass, obj)
-
     def serialize_included_context(self, context):
         serialized = {}
         for key, value in six.iteritems(context):
@@ -41,8 +45,8 @@ class SerializerProviderMixin(object):
                 serialized[key] = value
             else:
                 serializer = self.get_serializer(value)
-                serialized[key] = compat.serialize(serializer) if serializer else value
-            
+                serialized[key] = serializer.serialize() if serializer else value
+
         return serialized
 
 
@@ -51,19 +55,13 @@ class RendererProviderMixin(object):
     renderer_class = None
     angular_context_template_name = 'angularmagic/context-item.html'
 
-    def get_renderer_class(self):
-        if self.renderer_class:
-            return self.renderer_class
-        else:
-            return appsettings.DEFAULT_RENDERER_CLASS
-
     def get_renderer(self, context):
-        RendererClass = self.get_renderer_class()
-        return compat.create_renderer(RendererClass, context)
+        RendererClass = self.renderer_class or appsettings.DEFAULT_RENDERER_CLASS
+        return RendererClass(context)
 
     def render_included_context(self, context):
         renderer = self.get_renderer(context)
-        return compat.render(renderer, context)
+        return renderer.render()
 
     def render_data_block(self, data_context):
         rendered_context = self.render_included_context(data_context)
