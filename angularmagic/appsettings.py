@@ -1,7 +1,4 @@
-import datetime
-
 from . import default
-from .external import json
 
 
 ANGULAR_TOKENS = {

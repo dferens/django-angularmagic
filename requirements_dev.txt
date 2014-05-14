@@ -1,0 +1,8 @@
+# Runtime
+Django
+djangorestframework
+django-tastypie
+
+# Testing
+tox
+django-discover-runner

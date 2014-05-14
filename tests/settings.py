@@ -15,9 +15,6 @@ SECRET_KEY = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890'
 
 INTERNAL_IPS = ['127.0.0.1']
 
-
-# Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,14 +24,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'angularmagic',
-    'testproject',
+
+    'tags',
 ]
 
-MEDIA_URL = '/media/'   # Avoids https://code.djangoproject.com/ticket/21451
+MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'tests', 'static')
 
 STATIC_URL = '/static/'
+
+ROOT_URLCONF = 'urls.py'
 
 if django.VERSION[:2] < (1, 6):
     TEST_RUNNER = 'discover_runner.DiscoverRunner'
