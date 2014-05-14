@@ -1,5 +1,7 @@
 # django-angularmagic
 
+[![Build Status](https://travis-ci.org/dferens/django-angularmagic.svg?branch=master)](https://travis-ci.org/dferens/django-angularmagic)
+
 **Status: not implemented yet**
 
 ## Overview
