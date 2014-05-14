@@ -1,6 +1,7 @@
 # django-angularmagic
 
 [![Build Status](https://travis-ci.org/dferens/django-angularmagic.svg?branch=master)](https://travis-ci.org/dferens/django-angularmagic)
+[![Coverage Status](https://coveralls.io/repos/dferens/django-angularmagic/badge.png?branch=master)](https://coveralls.io/r/dferens/django-angularmagic?branch=master)
 
 **Status: not implemented yet**
 
