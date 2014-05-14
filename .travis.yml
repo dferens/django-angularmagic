@@ -7,4 +7,7 @@ env:
   - DJANGO_VERSION=1.6.1
 install:
   - pip install Django==$DJANGO_VERSION django-discover-runner
+  - pip install coveralls
 script: make test
+after_success:
+    coveralls

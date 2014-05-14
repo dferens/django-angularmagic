@@ -2,4 +2,7 @@ cleanpyc:
 	@find . -name "*.pyc" -exec rm -rf {} \;
 
 test:
-	python tests/manage.py test tags
+	coverage run tests/manage.py test tags
+
+coverage:
+	coverage html

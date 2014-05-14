@@ -36,5 +36,5 @@ STATIC_URL = '/static/'
 
 ROOT_URLCONF = 'urls.py'
 
-if django.VERSION[:2] < (1, 6):
+if django.VERSION[:2] < (1, 6):  # pragma: no cover
     TEST_RUNNER = 'discover_runner.DiscoverRunner'

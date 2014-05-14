@@ -54,3 +54,6 @@ docs/_build/
 
 # MacOS
 *.DS_Store
+
+# coverage
+.coverage

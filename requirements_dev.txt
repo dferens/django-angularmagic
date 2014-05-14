@@ -5,4 +5,5 @@ django-tastypie
 
 # Testing
 tox
+coverage
 django-discover-runner
