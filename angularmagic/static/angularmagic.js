@@ -22,9 +22,9 @@ module.factory('contextStorage', function() {
             case 'datetime.timedelta': {
               return new Date(Date.parse(value));
             }
-            default: return obj
           }
-        }
+        };
+        return obj;
       });
     },
     get: function() {return this._storage}
