@@ -1,28 +1,26 @@
 # django-angularmagic
 
-
 **Status: not implemented yet**
 
-<a name="overview"/>
 ## Overview
 
 Provides *{% angularapp %}* tag which simplifies integration of Angular views into complete Django apps.
 
-<a name="requirements/">
+
 ## Requirements
 
-* ~~~Python (2.6, 2.7, 3.2, 3.3)~~~
-* ~~~Django (1.4 - 1.6)~~~
-* [django-rest-framework](https://github.com/tomchristie/django-rest-framework)
+* ~~Python (2.6, 2.7, 3.2, 3.3)~~
+* ~~Django (1.4 - 1.6)~~
+* (optionally, [django-rest-framework](https://github.com/tomchristie/django-rest-framework))
+* (optionally, [django-tastypie](https://github.com/toastdriven/django-tastypie))
 
-<a name="example"/>
 ## Example
 
 Assume next Django app:
 
-```python
-# models.py
+**models.py**:
 
+```python
 from django.db import models
 
 class BlogPost(models.Model):
@@ -31,9 +29,11 @@ class BlogPost(models.Model):
 class BlogPostComment(models.Model):
     blogpost = models.ForeignKey(BlogPost, related_name='comments')
     text = models.TextField()
+```
 
-# views.py
+**views.py**:
 
+```python
 from django.views.generic import DetailView
 
 from . import models
@@ -51,7 +51,6 @@ Now the most interesting:
     ```python
     from django.views.generic import DetailView
     from angularmagic.views import AngularMagicMixin
-
     from . import models
 
     class BlogPostDetail(AngularMagicMixin, DetailView):
@@ -105,12 +104,8 @@ Now the most interesting:
 
 Everything will be evaluated by AngularJS.
 
-<a name="install"/>
 ## Installation
 
-```bash
-pip install django-angularmagic
-```
 ```python
 INSTALLED_APPS = (
     ...
@@ -127,7 +122,57 @@ Grab module with
 <script src="{% static 'angularmagic/angularmagic.js' %}"></script>
 ```
 
+## Configuration
+
+*AngularMagicMixin* provides next configuration variables:
+
+1. serializer_classes
+
+    You can specify how your models should be serialized with serializer classes.
+    Both *Serializer* of *rest_framework* and *Resource* or *tastypie* are supported:
+    
+    **api.py**:
+    
+    ```python
+    import rest_framework.serializers
+    import tastypie.resources
+    
+    from . import models
+    
+    class BlogPostSerializer(rest_framework.serializers.ModelSerializer):
+        class Meta:
+            model = models.BlogPost
+
+
+    class BlogPostCommentResource(tastypie.resources.ModelResource):
+        class Meta:
+            queryset = models.BlogPostComment.objects.all()
+
+    ```
+    
+    **views.py**:
+    
+    ```python
+    from django.views.generic import DetailView
+    from angularmagic.views import AngularMagicMixin
+    
+    from . import api, models
+    
+    class BlogPostDetail(AngularMagicMixin, DetailView):
+        ...
+        # Can be a dict
+        serializer_classes = {
+            models.BlogPost: api.BlogPostSerializer,
+            models.BlogPostComment: api.BlogPostCommentResource
+        }
+        # Or a list if each serializer/resource is model-related
+        # (i.e. is a ``ModelResource`` or ``ModelSerializer`` subclass):
+        serializer_classes = [BlogPostSerializer, BlogPostCommentResource]
+    ```
+    
+    Or create your own serializers using [base classes](/angularmagic/base.py)
+
 ## TODOs:
 * Add tests;
 * (?) Add *{% variable var_name %}* inclusion tag;
-* Add support of serializers from rest-framework & tastypie;
+* Add asynchronous context retrieval.
