@@ -16,16 +16,13 @@ class AngularAppNode(Node):
     def __init__(self, nodelist):
         self.nodelist = nodelist
 
-    def __repr__(self):
-        return '<{0}>'.format(type(self).__name__)
-
     def render(self, context):
         view = context.get('view')
+        angular_template = self.nodelist.render(context)
         if view and isinstance(view, AngularMagicMixin):
-            angular_template = self.nodelist.render(context)
             return view.render_angular_app(angular_template, context)
         else:
-            raise Exception()
+            return angular_template
 
 
 @contextmanager
