@@ -24,8 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'angularmagic',
-
-    'tags',
 ]
 
 MEDIA_URL = '/media/'
