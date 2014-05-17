@@ -3,12 +3,9 @@
 [![Build Status](https://travis-ci.org/dferens/django-angularmagic.svg?branch=master)](https://travis-ci.org/dferens/django-angularmagic)
 [![Coverage Status](https://coveralls.io/repos/dferens/django-angularmagic/badge.png?branch=master)](https://coveralls.io/r/dferens/django-angularmagic?branch=master)
 
-**Status: not implemented yet**
-
 ## Overview
 
 Provides *{% angularapp %}* tag which simplifies integration of Angular views into complete Django apps.
-
 
 ## Requirements
 
