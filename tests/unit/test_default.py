@@ -6,6 +6,8 @@ from django.test import TestCase
 
 from angularmagic.default import Serializer, Renderer
 
+from ..generic.models import TestModel
+
 
 class RendererTestCase(TestCase):
 
@@ -50,14 +52,6 @@ class RendererTestCase(TestCase):
 
 class SerializerTestCase(TestCase):
 
-    class TestModel(models.Model):
-        class Meta:
-            managed = False
-
-        number = models.IntegerField()
-        text = models.TextField()
-        salary = models.DecimalField()
-
     def testmodel_instance_gen(self):
         number, base_text, salary  = 0, 'test', Decimal('0.0')
 
@@ -65,7 +59,7 @@ class SerializerTestCase(TestCase):
             number += 1
             text = '%s_%s' % (base_text, number)
             salary += Decimal('0.1')
-            obj = self.TestModel(id=number, number=number, text=text, salary=salary)
+            obj = TestModel(id=number, number=number, text=text, salary=salary)
             yield obj
 
     def setUp(self):

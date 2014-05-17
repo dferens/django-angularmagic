@@ -4,11 +4,11 @@ except ImportError:
     import json
 try:
     import rest_framework
-except ImportError:
+except ImportError: # pragma: no cover
     rest_framework = False
 try:
     import tastypie
-except ImportError:
+except ImportError: # pragma: no cover
     tastypie = False
 
 import django.db.models
@@ -22,7 +22,7 @@ if rest_framework:
         def __init__(self, SerializerClass, obj):
             super(RestFrameworkSerializerAdapter, self).__init__(obj)
             self.SerializerClass = SerializerClass
-            self.model = SerializerClass.Meta.model
+            self.model = getattr(SerializerClass.Meta, 'model', None)
             self.obj = obj
 
         def serialize(self):
@@ -36,7 +36,11 @@ if tastypie:
         def __init__(self, ResourceClass, obj):
             super(TastypieSerializerAdapter, self).__init__(obj)
             self.resource = ResourceClass()
-            self.model = ResourceClass._meta.queryset.model
+            try:
+                self.model = ResourceClass._meta.queryset.model
+            except AttributeError:
+                self.model = None
+
             self.obj = obj
 
         def serialize(self):
