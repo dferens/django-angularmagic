@@ -9,13 +9,17 @@ from . import appsettings, base, external
 class SerializerProviderMixin(object):
 
     serializer_classes = []
+    primitive_types = (int, long, float, list, dict) + six.string_types
 
     def get_serializer(self, obj):
         """
         :return: ``angularmagic.base.Serializer`` instance
         """
         SerializerClass = None
-        ObjectClass = obj.model if isinstance(obj, QuerySet) else type(obj)
+        if isinstance(obj, QuerySet):
+            ObjectClass = obj.model
+        else:
+            ObjectClass = type(obj)
 
         if isinstance(self.serializer_classes, dict):
             SerializerClass = self.serializer_classes.get(ObjectClass, SerializerClass)
@@ -41,7 +45,7 @@ class SerializerProviderMixin(object):
     def serialize_included_context(self, context):
         serialized = {}
         for key, value in six.iteritems(context):
-            if isinstance(value, (int, long, float, list, dict)):
+            if isinstance(value, self.primitive_types):
                 serialized[key] = value
             else:
                 serializer = self.get_serializer(value)
