@@ -1,3 +1,5 @@
+import json
+from xml.dom.minidom import parseString
 import mock
 
 from django.test import TestCase
@@ -99,3 +101,44 @@ class SerializerProviderMixinTestCase(TestCase):
         self.assertEqual(serialize({'one': 1}), {'one': 1})
         # Complex objects
         self.assertEqual(serialize({'obj': TestModel()}), {'obj': 'serialized'})
+
+
+class RendererProviderMixinTestCase(TestCase):
+
+    def test_render_data_block(self):
+        class Renderer(base.Renderer):
+            def __init__(self, data):
+                self.render = lambda: json.dumps(data)
+
+        class MyView(views.RendererProviderMixin):
+            renderer_class = Renderer
+
+        view = MyView()
+        data = {'number': 1, 'obj': {'id': 1, 'text': 'test'}}
+        block_dom = parseString(view.render_data_block(data)).childNodes[0]
+        self.assertEqual(block_dom.nodeName, 'django-context-item')        
+        self.assertEqual(block_dom.attributes['bytes'].value, '47')
+        self.assertEqual(data, json.loads(block_dom.childNodes[0].nodeValue))
+
+
+class BaseAngularMagixMixinTestCase(TestCase):
+    
+    def test_render_angular_app(self):
+        class MyView(views.AngularMagicMixin):
+            data = {'number': 1, 'obj': {'id': 1, 'text': 'test'}}
+            def get_included_context(self, context):
+                return self.data
+
+        view = MyView()
+        html = view.render_angular_app('<div ng-app="app">{{view}}</div>', None)
+        dom = parseString('<html>%s</html>' % html).childNodes[0]
+        data_node, template_node = dom.childNodes[0], dom.childNodes[-1]
+        self.assertEqual(template_node.childNodes[0].nodeValue, '{{view}}')
+        self.assertEqual(json.loads(data_node.childNodes[0].nodeValue), view.data)
+
+    def test_get_included_context_warns_about_super(self):
+        class MyView(views.AngularMagicMixin):
+            pass
+
+        with self.assertRaises(NotImplementedError):
+            MyView().get_included_context({})

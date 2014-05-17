@@ -87,7 +87,7 @@ class BaseAngularMagicMixin(object):
         return rendered_context + angular_template
 
     def get_included_context(self, context):
-        return {}
+        raise NotImplementedError('No need to call super here')
 
 
 class AngularMagicMixin(BaseAngularMagicMixin,
