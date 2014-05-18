@@ -25,7 +25,8 @@ def disable(*module_names):
     kwargs = dict((k, mock.DEFAULT) for k in module_names)
     with mock.patch.multiple(angularmagic.external, **kwargs) as mocks:
         for mocked_module in mocks.values():
-            mocked_module.__nonzero__ = mock.Mock(return_value=False)
+            mocked_module.__bool__ = mock.Mock(return_value=False)
+            mocked_module.__nonzero__ = mocked_module.__bool__
 
         yield
 

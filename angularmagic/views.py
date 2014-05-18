@@ -9,7 +9,7 @@ from . import appsettings, base, external
 class SerializerProviderMixin(object):
 
     serializer_classes = []
-    primitive_types = (int, long, float, list, dict) + six.string_types
+    primitive_types = six.integer_types + six.string_types + (float, list, tuple)
 
     def get_serializer(self, obj):
         """

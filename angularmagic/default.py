@@ -48,9 +48,9 @@ class Serializer(base.Serializer):
         return result
 
     def serialize(self):
-        if hasattr(self.obj, '__iter__'):
+        if hasattr(self.obj, '__iter__') and not isinstance(self.obj, dict):
             if len(self.obj):
-                ObjectClass = type(self.obj[0])
+                ObjectClass = type(self.obj[0])                    
                 many = True
             else:
                 return []

@@ -77,7 +77,7 @@ class SerializerTestCase(TestCase):
                 self.instance_attribute = 2
 
         obj = NonModelClass()
-        obj_list = map(lambda x: NonModelClass(), range(5))
+        obj_list = [NonModelClass() for x in range(5)]
         self.assertEqual(self.serialize(obj), obj)
         self.assertEqual(self.serialize(obj_list), obj_list)
 

@@ -9,7 +9,7 @@ Provides *{% angularapp %}* tag which simplifies integration of Angular views in
 
 ## Requirements
 
-* Python 2.6, 2.7, ~~3.2, 3.3~~
+* Python 2.6, 2.7, 3.3, 3.4
 * Django 1.5+
 * (optionally, [django-rest-framework](https://github.com/tomchristie/django-rest-framework))
 * (optionally, [django-tastypie](https://github.com/toastdriven/django-tastypie))
