@@ -41,8 +41,11 @@ class Serializer(base.Serializer):
         """
         :param obj: ``django.db.models.Model`` instance
         """
-        return {f.name: f.value_from_object(obj) \
-                for f in type(obj)._meta.fields}
+        result = {}
+        for field in type(obj)._meta.fields:
+            result[field.name] = field.value_from_object(obj)
+
+        return result
 
     def serialize(self):
         if hasattr(self.obj, '__iter__'):
